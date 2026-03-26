@@ -29,7 +29,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-avtovaz-blue-light/10 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-avtovaz-blue-light/10 to-white flex flex-col">
       {/* Header */}
       <header className="bg-avtovaz-blue text-white py-4 shadow-lg">
         <div className="container mx-auto px-4">
@@ -58,7 +58,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
+      <main className="container mx-auto px-4 py-8 max-w-4xl flex-grow">
         {!isAuthenticated ? (
           <Card className="shadow-lg">
             <CardHeader className="bg-avtovaz-blue-light/5">
@@ -243,7 +243,7 @@ export default function Home() {
         )}
       </main>
 
-      <footer className="bg-avtovaz-blue-dark text-white py-6 mt-12">
+      <footer className="bg-avtovaz-blue-dark text-white py-6 mt-auto">
         <div className="container mx-auto px-4 text-center">
           <p className="text-sm">
             © {new Date().getFullYear()} ПАО «АвтоВАЗ». Все права защищены.
