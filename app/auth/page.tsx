@@ -13,7 +13,7 @@ type Step = 'choose' | 'code' | 'register' | 'registerCode'
 export default function AuthPage() {
   const router = useRouter()
   const [step, setStep] = useState<Step>('choose')
-  const [authMethod, setAuthMethod] = useState<'phone' | 'email'>('phone')
+  const [authMethod, setAuthMethod] = useState<'phone' | 'email'>('email')
   const [contact, setContact] = useState('')
   const [code, setCode] = useState('')
   const [error, setError] = useState('')
@@ -128,8 +128,10 @@ export default function AuthPage() {
                     variant={authMethod === 'phone' ? 'default' : 'outline'}
                     onClick={() => setAuthMethod('phone')}
                     className="flex-1"
+                    disabled
                   >
                     Телефон
+                    <span className="ml-2 text-xs text-muted-foreground">(скоро)</span>
                   </Button>
                   <Button
                     type="button"

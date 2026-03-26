@@ -84,16 +84,17 @@ export class EmailService {
       subject: 'Обращение принято',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #003366;">Ваше обращение принято</h2>
+          <h2 style="color: #003366;">Обращение успешно создано</h2>
+          <p>Ваше обращение успешно зарегистрировано и будет рассмотрено в ближайшее время.</p>
           <p>Регистрационный номер вашего обращения:</p>
           <div style="background-color: #f5f5f5; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; margin: 20px 0;">
             ${appealNumber}
           </div>
-          <p style="color: #666;">Мы свяжемся с вами в ближайшее время.</p>
+          <p style="color: #666;">Мы свяжемся с вами в ближайшее время для уточнения деталей.</p>
           <p style="color: #666;">С уважением,<br/>Команда LADA</p>
         </div>
       `,
-      text: `Ваше обращение принято. Регистрационный номер: ${appealNumber}. Мы свяжемся с вами в ближайшее время.`,
+      text: `Обращение успешно создано. Ваше обращение будет рассмотрено в ближайшее время. Регистрационный номер: ${appealNumber}.`,
     };
 
     try {
