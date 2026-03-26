@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -8,16 +9,24 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 
 export default function Home() {
+  const router = useRouter()
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [userName, setUserName] = useState("")
   const [submitted, setSubmitted] = useState(false)
 
-  const handleAuth = (e: React.FormEvent) => {
-    e.preventDefault()
-    const form = e.target as HTMLFormElement
-    const name = (form.elements.namedItem("name") as HTMLInputElement).value
-    setUserName(name)
-    setIsAuthenticated(true)
+  useEffect(() => {
+    const user = localStorage.getItem('user')
+    if (user) {
+      const userData = JSON.parse(user)
+      setUserName(userData.name || userData.firstName + ' ' + userData.lastName)
+      setIsAuthenticated(true)
+    }
+  }, [])
+
+  const handleLogout = () => {
+    localStorage.removeItem('user')
+    setIsAuthenticated(false)
+    setUserName("")
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -45,10 +54,7 @@ export default function Home() {
                   variant="outline"
                   size="sm"
                   className="bg-white text-avtovaz-blue hover:bg-white/90"
-                  onClick={() => {
-                    setIsAuthenticated(false)
-                    setUserName("")
-                  }}
+                  onClick={handleLogout}
                 >
                   Выйти
                 </Button>
@@ -62,46 +68,22 @@ export default function Home() {
         {!isAuthenticated ? (
           <Card className="shadow-lg">
             <CardHeader className="bg-avtovaz-blue-light/5">
-              <CardTitle className="text-2xl text-avtovaz-blue">Вход через ЕСИА</CardTitle>
+              <CardTitle className="text-2xl text-avtovaz-blue">Вход</CardTitle>
               <CardDescription>
-                Для отправки обращения необходимо авторизоваться через Госуслуги
+                Для отправки обращения необходимо авторизоваться через Lecar ID
               </CardDescription>
             </CardHeader>
-            <CardContent className="pt-6">
-              <form onSubmit={handleAuth} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">ФИО</Label>
-                  <Input
-                    id="name"
-                    name="name"
-                    placeholder="Введите ФИО"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="snils">СНИЛС</Label>
-                  <Input
-                    id="snils"
-                    placeholder="000-000-000 00"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Пароль</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Введите пароль"
-                    required
-                  />
-                </div>
-                <Button type="submit" className="w-full" size="lg">
-                  Войти через ЕСИА (Госуслуги)
-                </Button>
-                <p className="text-xs text-center text-muted-foreground mt-4">
-                  Демо-режим: введите любые данные для входа
-                </p>
-              </form>
+            <CardContent className="pt-6 text-center">
+              <p className="mb-6 text-muted-foreground">
+                Войдите через телефон или email
+              </p>
+              <Button
+                size="lg"
+                className="w-full"
+                onClick={() => router.push('/auth')}
+              >
+                Войти через Lecar ID
+              </Button>
             </CardContent>
           </Card>
         ) : (
