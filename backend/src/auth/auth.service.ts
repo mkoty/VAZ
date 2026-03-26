@@ -1,9 +1,13 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private emailService: EmailService,
+  ) {}
 
   // Mock OTP storage (в продакшене использовать Redis)
   private otpStorage = new Map<string, string>();
@@ -13,11 +17,24 @@ export class AuthService {
       ? await this.usersService.findByPhone(contact)
       : await this.usersService.findByEmail(contact);
 
-    // Генерируем код (в продакшене отправлять через SMS/Email сервис)
+    // Генерируем код
     const code = this.generateOTP();
     this.otpStorage.set(contact, code);
 
-    console.log(`📱 OTP для ${contact}: ${code}`);
+    // Отправляем код на email (всегда используем email для верификации)
+    const email = method === 'email' ? contact : user?.email;
+    if (email) {
+      try {
+        await this.emailService.sendVerificationCode(email, code);
+        console.log(`✅ Код отправлен на email ${email}`);
+      } catch (error) {
+        console.error(`❌ Ошибка отправки email: ${error.message}`);
+        // Для разработки продолжаем работу даже если email не отправлен
+        console.log(`📱 OTP для ${contact}: ${code}`);
+      }
+    } else {
+      console.log(`📱 OTP для ${contact}: ${code}`);
+    }
 
     return {
       success: true,
@@ -66,7 +83,18 @@ export class AuthService {
     const code = this.generateOTP();
     this.otpStorage.set(contact, code);
 
-    console.log(`📱 Регистрация OTP для ${contact}: ${code}`);
+    // Отправляем код на email (если указан)
+    if (userData.email) {
+      try {
+        await this.emailService.sendVerificationCode(userData.email, code);
+        console.log(`✅ Код регистрации отправлен на ${userData.email}`);
+      } catch (error) {
+        console.error(`❌ Ошибка отправки email: ${error.message}`);
+        console.log(`📱 Регистрация OTP для ${contact}: ${code}`);
+      }
+    } else {
+      console.log(`📱 Регистрация OTP для ${contact}: ${code}`);
+    }
 
     return {
       success: true,

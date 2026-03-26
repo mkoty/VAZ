@@ -2,6 +2,7 @@ import { Injectable, Optional } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Appeal, AppealStatus } from './appeal.entity';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class AppealsService {
@@ -12,24 +13,41 @@ export class AppealsService {
   constructor(
     @Optional()
     @InjectRepository(Appeal)
-    private appealsRepository?: Repository<Appeal>,
+    private appealsRepository: Repository<Appeal> | undefined,
+    private emailService: EmailService,
   ) {}
 
   async create(appealData: Partial<Appeal>): Promise<Appeal> {
+    let appeal: Appeal;
+
     if (this.appealsRepository) {
-      const appeal = this.appealsRepository.create(appealData);
-      return this.appealsRepository.save(appeal);
+      const newAppeal = this.appealsRepository.create(appealData);
+      appeal = await this.appealsRepository.save(newAppeal);
+    } else {
+      // Mock создание обращения
+      appeal = {
+        id: String(this.mockIdCounter++),
+        ...appealData,
+        status: AppealStatus.NEW,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as Appeal;
+      this.mockAppeals.push(appeal);
     }
 
-    // Mock создание обращения
-    const appeal: Appeal = {
-      id: String(this.mockIdCounter++),
-      ...appealData,
-      status: AppealStatus.NEW,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    } as Appeal;
-    this.mockAppeals.push(appeal);
+    // Отправляем подтверждение на email
+    if (appealData.email) {
+      try {
+        await this.emailService.sendAppealConfirmation(
+          appealData.email,
+          appeal.id,
+        );
+        console.log(`✅ Подтверждение обращения отправлено на ${appealData.email}`);
+      } catch (error) {
+        console.error(`❌ Ошибка отправки email: ${error.message}`);
+      }
+    }
+
     console.log('📝 Создано обращение:', appeal);
     return appeal;
   }
