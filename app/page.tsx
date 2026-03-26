@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { LadaLogo } from "@/components/ui/logo"
 import { api } from "@/lib/api"
 
 export default function Home() {
@@ -67,14 +68,16 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-avtovaz-blue-light/10 to-white flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-lada-blue-light/10 to-white flex flex-col">
       {/* Header */}
-      <header className="bg-avtovaz-blue text-white py-4 shadow-lg">
+      <header className="bg-lada-blue text-white py-4 shadow-lg">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold">АвтоВАЗ</h1>
-              <p className="text-sm text-white/90">Интернет-приемная</p>
+            <div className="flex items-center gap-4">
+              <LadaLogo className="h-8 w-auto text-white" />
+              <div className="border-l border-white/30 pl-4">
+                <p className="text-sm font-medium">Интернет-приемная</p>
+              </div>
             </div>
             {isAuthenticated && (
               <div className="flex items-center gap-4">
@@ -82,7 +85,7 @@ export default function Home() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="bg-white text-avtovaz-blue hover:bg-white/90"
+                  className="bg-white text-lada-blue hover:bg-white/90 border-white"
                   onClick={handleLogout}
                 >
                   Выйти
@@ -96,8 +99,8 @@ export default function Home() {
       <main className="container mx-auto px-4 py-8 max-w-4xl flex-grow">
         {!isAuthenticated ? (
           <Card className="shadow-lg">
-            <CardHeader className="bg-avtovaz-blue-light/5">
-              <CardTitle className="text-2xl text-avtovaz-blue">Вход</CardTitle>
+            <CardHeader className="bg-lada-blue-light/5">
+              <CardTitle className="text-2xl text-lada-blue">Вход</CardTitle>
               <CardDescription>
                 Для отправки обращения необходимо авторизоваться
               </CardDescription>
@@ -126,9 +129,9 @@ export default function Home() {
           </Card>
         ) : (
           <div className="space-y-6">
-            <Card className="shadow-lg border-avtovaz-blue/20">
-              <CardHeader className="bg-avtovaz-blue-light/5">
-                <CardTitle className="text-2xl text-avtovaz-blue">Отправить обращение</CardTitle>
+            <Card className="shadow-lg border-lada-blue/20">
+              <CardHeader className="bg-lada-blue-light/5">
+                <CardTitle className="text-2xl text-lada-blue">Отправить обращение</CardTitle>
                 <CardDescription>
                   Заполните форму для отправки вашего обращения в АвтоВАЗ
                 </CardDescription>
@@ -137,7 +140,7 @@ export default function Home() {
                 {submitted ? (
                   <div className="text-center py-8 space-y-6">
                     <div className="text-6xl mb-4">✓</div>
-                    <h3 className="text-xl font-semibold text-avtovaz-blue mb-2">
+                    <h3 className="text-xl font-semibold text-lada-blue mb-2">
                       Обращение отправлено
                     </h3>
                     <p className="text-muted-foreground">
@@ -179,7 +182,7 @@ export default function Home() {
                       <Label htmlFor="category">Категория обращения *</Label>
                       <select
                         id="category"
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-avtovaz-blue focus-visible:ring-offset-2"
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lada-blue focus-visible:ring-offset-2"
                         required
                       >
                         <option value="">Выберите категорию</option>
@@ -231,7 +234,7 @@ export default function Home() {
                       <input
                         type="checkbox"
                         id="agreement"
-                        className="mt-1 h-4 w-4 rounded border-gray-300 text-avtovaz-blue focus:ring-avtovaz-blue"
+                        className="mt-1 h-4 w-4 rounded border-gray-300 text-lada-blue focus:ring-lada-blue"
                         required
                       />
                       <Label htmlFor="agreement" className="text-sm font-normal cursor-pointer">
@@ -250,9 +253,9 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            <Card className="shadow-lg border-avtovaz-blue/10">
+            <Card className="shadow-lg border-lada-blue/10">
               <CardHeader>
-                <CardTitle className="text-lg text-avtovaz-blue">Информация</CardTitle>
+                <CardTitle className="text-lg text-lada-blue">Информация</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
                 <p>
@@ -274,7 +277,7 @@ export default function Home() {
         )}
       </main>
 
-      <footer className="bg-avtovaz-blue-dark text-white py-6 mt-auto">
+      <footer className="bg-lada-blue text-white py-6 mt-auto">
         <div className="container mx-auto px-4 text-center">
           <p className="text-sm">
             © {new Date().getFullYear()} ПАО «АвтоВАЗ». Все права защищены.

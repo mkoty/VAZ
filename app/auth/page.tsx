@@ -110,12 +110,12 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-avtovaz-blue-light/10 to-white flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-b from-lada-blue-light/10 to-white flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-lg">
         {step === 'choose' && (
           <>
-            <CardHeader className="bg-avtovaz-blue-light/5">
-              <CardTitle className="text-2xl text-avtovaz-blue">Вход</CardTitle>
+            <CardHeader className="bg-lada-blue-light/5">
+              <CardTitle className="text-2xl text-lada-blue">Вход</CardTitle>
               <CardDescription>
                 Авторизация через LADA ID
               </CardDescription>

@@ -10,12 +10,20 @@ export default {
   theme: {
     extend: {
       colors: {
+        lada: {
+          'blue': '#003D7A',          // Основной синий LADA
+          'blue-light': '#0066B3',    // Светло-синий
+          'red': '#E30613',           // Красный акцент
+          'gray': '#4C5865',          // Серый текст
+          'gray-light': '#F5F5F5',    // Светлый фон
+        },
+        // Для обратной совместимости
         avtovaz: {
-          blue: '#0066B3',
-          'blue-dark': '#004A8F',
-          'blue-light': '#4D94D1',
-          gray: '#6B7280',
-          'gray-light': '#F3F4F6',
+          blue: '#003D7A',
+          'blue-dark': '#003D7A',
+          'blue-light': '#0066B3',
+          gray: '#4C5865',
+          'gray-light': '#F5F5F5',
         },
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
