@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Для Timeweb Cloud используем standalone режим вместо export
-  output: process.env.DEPLOY_TARGET === 'timeweb' ? 'standalone' : 'export',
+  // Для GitHub Pages используем export, для остальных - стандартный режим
+  output: process.env.DEPLOY_TARGET === 'github' ? 'export' : undefined,
   images: {
     unoptimized: true,
   },
