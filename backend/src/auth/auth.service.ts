@@ -28,7 +28,8 @@ export class AuthService {
         await this.emailService.sendVerificationCode(email, code);
         console.log(`✅ Код отправлен на email ${email}`);
       } catch (error) {
-        console.error(`❌ Ошибка отправки email: ${error.message}`);
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        console.error(`❌ Ошибка отправки email: ${message}`);
         // Для разработки продолжаем работу даже если email не отправлен
         console.log(`📱 OTP для ${contact}: ${code}`);
       }
@@ -89,7 +90,8 @@ export class AuthService {
         await this.emailService.sendVerificationCode(userData.email, code);
         console.log(`✅ Код регистрации отправлен на ${userData.email}`);
       } catch (error) {
-        console.error(`❌ Ошибка отправки email: ${error.message}`);
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        console.error(`❌ Ошибка отправки email: ${message}`);
         console.log(`📱 Регистрация OTP для ${contact}: ${code}`);
       }
     } else {

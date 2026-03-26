@@ -44,7 +44,8 @@ export class AppealsService {
         );
         console.log(`✅ Подтверждение обращения отправлено на ${appealData.email}`);
       } catch (error) {
-        console.error(`❌ Ошибка отправки email: ${error.message}`);
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        console.error(`❌ Ошибка отправки email: ${message}`);
       }
     }
 

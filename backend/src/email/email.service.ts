@@ -67,7 +67,8 @@ export class EmailService {
     } catch (error) {
       console.error('❌ Ошибка отправки email:', error);
       console.error('Детали ошибки:', JSON.stringify(error, null, 2));
-      throw new Error(`Failed to send verification email: ${error.message}`);
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Failed to send verification email: ${message}`);
     }
   }
 
@@ -97,7 +98,8 @@ export class EmailService {
     } catch (error) {
       console.error('❌ Ошибка отправки email:', error);
       console.error('Детали ошибки:', JSON.stringify(error, null, 2));
-      throw new Error(`Failed to send appeal confirmation: ${error.message}`);
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Failed to send appeal confirmation: ${message}`);
     }
   }
 }
