@@ -55,9 +55,6 @@ export default function Home() {
       await api.createAppeal(formData)
       setSubmitted(true)
       form.reset()
-      setTimeout(() => {
-        setSubmitted(false)
-      }, 5000)
     } catch (err) {
       setError('Ошибка отправки обращения')
     } finally {
@@ -98,11 +95,11 @@ export default function Home() {
             <CardHeader className="bg-avtovaz-blue-light/5">
               <CardTitle className="text-2xl text-avtovaz-blue">Вход</CardTitle>
               <CardDescription>
-                Для отправки обращения необходимо авторизоваться через Lecar ID
+                Для отправки обращения необходимо авторизоваться
               </CardDescription>
             </CardHeader>
-            <CardContent className="pt-6 text-center">
-              <p className="mb-6 text-muted-foreground">
+            <CardContent className="pt-6 space-y-3">
+              <p className="text-center mb-6 text-muted-foreground">
                 Войдите через телефон или email
               </p>
               <Button
@@ -110,7 +107,16 @@ export default function Home() {
                 className="w-full"
                 onClick={() => router.push('/auth')}
               >
-                Войти через Lecar ID
+                Войти через LADA ID
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full"
+                disabled
+              >
+                Войти через Госуслуги
+                <span className="ml-2 text-xs text-muted-foreground">(скоро)</span>
               </Button>
             </CardContent>
           </Card>
@@ -125,7 +131,7 @@ export default function Home() {
               </CardHeader>
               <CardContent className="pt-6">
                 {submitted ? (
-                  <div className="text-center py-8">
+                  <div className="text-center py-8 space-y-6">
                     <div className="text-6xl mb-4">✓</div>
                     <h3 className="text-xl font-semibold text-avtovaz-blue mb-2">
                       Обращение отправлено
@@ -133,6 +139,13 @@ export default function Home() {
                     <p className="text-muted-foreground">
                       Ваше обращение принято. Регистрационный номер будет отправлен на указанный email.
                     </p>
+                    <Button
+                      size="lg"
+                      onClick={() => setSubmitted(false)}
+                      className="mt-4"
+                    >
+                      Создать новое обращение
+                    </Button>
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-6">

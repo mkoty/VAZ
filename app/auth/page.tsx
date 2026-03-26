@@ -117,7 +117,7 @@ export default function AuthPage() {
             <CardHeader className="bg-avtovaz-blue-light/5">
               <CardTitle className="text-2xl text-avtovaz-blue">Вход</CardTitle>
               <CardDescription>
-                Авторизация через Lecar ID
+                Авторизация через LADA ID
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-6">
@@ -173,7 +173,7 @@ export default function AuthPage() {
             <CardHeader>
               <CardTitle>Введите код</CardTitle>
               <CardDescription>
-                Код отправлен на {authMethod === 'phone' ? 'телефон' : 'почту'}: {contact}
+                Код отправлен на email: {contact}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -277,7 +277,7 @@ export default function AuthPage() {
             <CardHeader>
               <CardTitle>Подтверждение регистрации</CardTitle>
               <CardDescription>
-                Код отправлен на {phone || email}
+                Код отправлен на email: {email}
               </CardDescription>
             </CardHeader>
             <CardContent>
