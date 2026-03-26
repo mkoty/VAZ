@@ -29,31 +29,22 @@ export default function AuthPage() {
     setError('')
     setLoading(true)
 
-    try {
-      const res = await fetch('/api/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'requestCode',
-          [authMethod]: contact
-        })
-      })
+    // Имитация задержки сети
+    await new Promise(resolve => setTimeout(resolve, 800))
 
-      const data = await res.json()
+    // Mock: 70% шанс что пользователь существует
+    const userExists = Math.random() > 0.3
 
-      if (data.userExists) {
-        setStep('code')
-      } else {
-        // Пользователь не найден - на регистрацию
-        setStep('register')
-        if (authMethod === 'phone') setPhone(contact)
-        if (authMethod === 'email') setEmail(contact)
-      }
-    } catch (err) {
-      setError('Ошибка соединения')
-    } finally {
-      setLoading(false)
+    if (userExists) {
+      setStep('code')
+    } else {
+      // Пользователь не найден - на регистрацию
+      setStep('register')
+      if (authMethod === 'phone') setPhone(contact)
+      if (authMethod === 'email') setEmail(contact)
     }
+
+    setLoading(false)
   }
 
   const handleVerifyCode = async (e: React.FormEvent) => {
@@ -61,30 +52,24 @@ export default function AuthPage() {
     setError('')
     setLoading(true)
 
-    try {
-      const res = await fetch('/api/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'verifyCode',
-          [authMethod]: contact,
-          code
-        })
-      })
+    // Имитация задержки сети
+    await new Promise(resolve => setTimeout(resolve, 600))
 
-      const data = await res.json()
-
-      if (data.success) {
-        localStorage.setItem('user', JSON.stringify(data.user))
-        router.push('/')
-      } else {
-        setError(data.message)
+    // Mock: проверка кода (код 1234)
+    if (code === '1234') {
+      const user = {
+        id: 'user-' + Date.now(),
+        name: 'Иван Иванов',
+        phone: authMethod === 'phone' ? contact : '',
+        email: authMethod === 'email' ? contact : ''
       }
-    } catch (err) {
-      setError('Ошибка соединения')
-    } finally {
-      setLoading(false)
+      localStorage.setItem('user', JSON.stringify(user))
+      router.push('/')
+    } else {
+      setError('Неверный код. Используйте 1234')
     }
+
+    setLoading(false)
   }
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -92,25 +77,12 @@ export default function AuthPage() {
     setError('')
     setLoading(true)
 
-    try {
-      const res = await fetch('/api/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'register',
-          phone,
-          email
-        })
-      })
+    // Имитация задержки сети
+    await new Promise(resolve => setTimeout(resolve, 800))
 
-      if (res.ok) {
-        setStep('registerCode')
-      }
-    } catch (err) {
-      setError('Ошибка соединения')
-    } finally {
-      setLoading(false)
-    }
+    // Mock: отправка кода верификации
+    setStep('registerCode')
+    setLoading(false)
   }
 
   const handleConfirmRegistration = async (e: React.FormEvent) => {
@@ -118,30 +90,26 @@ export default function AuthPage() {
     setError('')
     setLoading(true)
 
-    try {
-      const res = await fetch('/api/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'confirmRegistration',
-          code,
-          userData: { firstName, lastName, email, phone }
-        })
-      })
+    // Имитация задержки сети
+    await new Promise(resolve => setTimeout(resolve, 600))
 
-      const data = await res.json()
-
-      if (data.success) {
-        localStorage.setItem('user', JSON.stringify(data.user))
-        router.push('/')
-      } else {
-        setError(data.message)
+    // Mock: проверка кода и создание пользователя
+    if (code === '1234') {
+      const user = {
+        id: 'user-' + Date.now(),
+        firstName,
+        lastName,
+        name: firstName + ' ' + lastName,
+        email,
+        phone
       }
-    } catch (err) {
-      setError('Ошибка соединения')
-    } finally {
-      setLoading(false)
+      localStorage.setItem('user', JSON.stringify(user))
+      router.push('/')
+    } else {
+      setError('Неверный код. Используйте 1234')
     }
+
+    setLoading(false)
   }
 
   return (
