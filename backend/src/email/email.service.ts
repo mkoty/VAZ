@@ -10,17 +10,35 @@ export class EmailService {
   constructor(private configService: ConfigService) {
     // Определяем провайдера (Gmail или Yandex)
     const emailUser = this.configService.get<string>('EMAIL_USER');
+    const emailPassword = this.configService.get<string>('EMAIL_PASSWORD');
     const isYandex = emailUser?.includes('@yandex');
+
+    if (!emailUser || !emailPassword) {
+      console.warn('⚠️ EMAIL_USER или EMAIL_PASSWORD не настроены. Email отправка отключена.');
+    }
 
     this.transporter = nodemailer.createTransport({
       host: isYandex ? 'smtp.yandex.ru' : 'smtp.gmail.com',
-      port: 465,
-      secure: true, // use SSL
+      port: isYandex ? 465 : 587,
+      secure: isYandex, // true для Yandex (465), false для Gmail (587)
       auth: {
         user: emailUser,
-        pass: this.configService.get<string>('EMAIL_PASSWORD'),
+        pass: emailPassword,
       },
+      debug: true, // Включаем debug режим
+      logger: true, // Включаем логирование
     });
+
+    // Проверяем подключение при старте
+    if (emailUser && emailPassword) {
+      this.transporter.verify((error, success) => {
+        if (error) {
+          console.error('❌ Ошибка подключения к SMTP:', error);
+        } else {
+          console.log('✅ SMTP сервер готов к отправке писем');
+        }
+      });
+    }
   }
 
   async sendVerificationCode(email: string, code: string): Promise<void> {
@@ -43,11 +61,13 @@ export class EmailService {
     };
 
     try {
-      await this.transporter.sendMail(mailOptions);
-      console.log(`Verification code sent to ${email}`);
+      const info = await this.transporter.sendMail(mailOptions);
+      console.log(`✅ Код верификации отправлен на ${email}`);
+      console.log('Message ID:', info.messageId);
     } catch (error) {
-      console.error('Error sending email:', error);
-      throw new Error('Failed to send verification email');
+      console.error('❌ Ошибка отправки email:', error);
+      console.error('Детали ошибки:', JSON.stringify(error, null, 2));
+      throw new Error(`Failed to send verification email: ${error.message}`);
     }
   }
 
@@ -71,11 +91,13 @@ export class EmailService {
     };
 
     try {
-      await this.transporter.sendMail(mailOptions);
-      console.log(`Appeal confirmation sent to ${email}`);
+      const info = await this.transporter.sendMail(mailOptions);
+      console.log(`✅ Подтверждение обращения отправлено на ${email}`);
+      console.log('Message ID:', info.messageId);
     } catch (error) {
-      console.error('Error sending email:', error);
-      throw new Error('Failed to send appeal confirmation email');
+      console.error('❌ Ошибка отправки email:', error);
+      console.error('Детали ошибки:', JSON.stringify(error, null, 2));
+      throw new Error(`Failed to send appeal confirmation: ${error.message}`);
     }
   }
 }
