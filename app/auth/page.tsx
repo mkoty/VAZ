@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { api } from "@/lib/api"
 
 type Step = 'choose' | 'code' | 'register' | 'registerCode'
 
@@ -29,22 +30,22 @@ export default function AuthPage() {
     setError('')
     setLoading(true)
 
-    // Имитация задержки сети
-    await new Promise(resolve => setTimeout(resolve, 800))
+    try {
+      const result = await api.requestCode(contact, authMethod)
 
-    // Mock: 70% шанс что пользователь существует
-    const userExists = Math.random() > 0.3
-
-    if (userExists) {
-      setStep('code')
-    } else {
-      // Пользователь не найден - на регистрацию
-      setStep('register')
-      if (authMethod === 'phone') setPhone(contact)
-      if (authMethod === 'email') setEmail(contact)
+      if (result.userExists) {
+        setStep('code')
+      } else {
+        // Пользователь не найден - на регистрацию
+        setStep('register')
+        if (authMethod === 'phone') setPhone(contact)
+        if (authMethod === 'email') setEmail(contact)
+      }
+    } catch (err) {
+      setError('Ошибка соединения с сервером')
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   const handleVerifyCode = async (e: React.FormEvent) => {
@@ -52,24 +53,19 @@ export default function AuthPage() {
     setError('')
     setLoading(true)
 
-    // Имитация задержки сети
-    await new Promise(resolve => setTimeout(resolve, 600))
+    try {
+      const result = await api.verifyCode(contact, code, authMethod)
 
-    // Mock: проверка кода (код 1234)
-    if (code === '1234') {
-      const user = {
-        id: 'user-' + Date.now(),
-        name: 'Иван Иванов',
-        phone: authMethod === 'phone' ? contact : '',
-        email: authMethod === 'email' ? contact : ''
+      if (result.success) {
+        localStorage.setItem('user', JSON.stringify(result.user))
+        localStorage.setItem('token', result.token)
+        router.push('/')
       }
-      localStorage.setItem('user', JSON.stringify(user))
-      router.push('/')
-    } else {
-      setError('Неверный код. Используйте 1234')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Неверный код')
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -77,12 +73,14 @@ export default function AuthPage() {
     setError('')
     setLoading(true)
 
-    // Имитация задержки сети
-    await new Promise(resolve => setTimeout(resolve, 800))
-
-    // Mock: отправка кода верификации
-    setStep('registerCode')
-    setLoading(false)
+    try {
+      await api.register({ firstName, lastName, phone, email })
+      setStep('registerCode')
+    } catch (err) {
+      setError('Ошибка регистрации')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleConfirmRegistration = async (e: React.FormEvent) => {
@@ -90,26 +88,25 @@ export default function AuthPage() {
     setError('')
     setLoading(true)
 
-    // Имитация задержки сети
-    await new Promise(resolve => setTimeout(resolve, 600))
-
-    // Mock: проверка кода и создание пользователя
-    if (code === '1234') {
-      const user = {
-        id: 'user-' + Date.now(),
+    try {
+      const result = await api.confirmRegistration({
         firstName,
         lastName,
-        name: firstName + ' ' + lastName,
+        phone,
         email,
-        phone
-      }
-      localStorage.setItem('user', JSON.stringify(user))
-      router.push('/')
-    } else {
-      setError('Неверный код. Используйте 1234')
-    }
+        code
+      })
 
-    setLoading(false)
+      if (result.success) {
+        localStorage.setItem('user', JSON.stringify(result.user))
+        localStorage.setItem('token', result.token)
+        router.push('/')
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Неверный код')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (

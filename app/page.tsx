@@ -7,34 +7,62 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { api } from "@/lib/api"
 
 export default function Home() {
   const router = useRouter()
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [userName, setUserName] = useState("")
+  const [userId, setUserId] = useState("")
   const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
 
   useEffect(() => {
     const user = localStorage.getItem('user')
     if (user) {
       const userData = JSON.parse(user)
       setUserName(userData.name || userData.firstName + ' ' + userData.lastName)
+      setUserId(userData.id)
       setIsAuthenticated(true)
     }
   }, [])
 
   const handleLogout = () => {
     localStorage.removeItem('user')
+    localStorage.removeItem('token')
     setIsAuthenticated(false)
     setUserName("")
+    setUserId("")
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSubmitted(true)
-    setTimeout(() => {
-      setSubmitted(false)
-    }, 5000)
+    setError('')
+    setLoading(true)
+
+    const form = e.target as HTMLFormElement
+    const formData = {
+      userId,
+      category: (form.elements.namedItem('category') as HTMLSelectElement).value,
+      subject: (form.elements.namedItem('subject') as HTMLInputElement).value,
+      message: (form.elements.namedItem('message') as HTMLTextAreaElement).value,
+      email: (form.elements.namedItem('email') as HTMLInputElement).value,
+      phone: (form.elements.namedItem('phone') as HTMLInputElement).value,
+    }
+
+    try {
+      await api.createAppeal(formData)
+      setSubmitted(true)
+      form.reset()
+      setTimeout(() => {
+        setSubmitted(false)
+      }, 5000)
+    } catch (err) {
+      setError('Ошибка отправки обращения')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -193,8 +221,10 @@ export default function Home() {
                       </Label>
                     </div>
 
-                    <Button type="submit" className="w-full" size="lg">
-                      Отправить обращение
+                    {error && <p className="text-sm text-red-600">{error}</p>}
+
+                    <Button type="submit" className="w-full" size="lg" disabled={loading}>
+                      {loading ? 'Отправка...' : 'Отправить обращение'}
                     </Button>
                   </form>
                 )}
