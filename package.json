@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "start:standalone": "node .next/standalone/server.js",
+    "start:timeweb": "node server.js",
     "lint": "next lint",
     "build:github": "DEPLOY_TARGET=github next build",
     "build:timeweb": "DEPLOY_TARGET=timeweb next build"
