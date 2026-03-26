@@ -1,133 +1,234 @@
-# Разработка локально
+# 🛠️ Локальная разработка с Railway PostgreSQL
+
+## Быстрый старт
+
+### 1. Клонирование и установка
+
+```bash
+git clone https://github.com/mkoty/VAZ.git
+cd VAZ
+npm install
+cd backend && npm install && cd ..
+```
+
+### 2. Настройка Backend
+
+Скопируйте **DATABASE_PUBLIC_URL** из Railway PostgreSQL:
+
+1. Откройте https://railway.app
+2. Ваш проект → PostgreSQL сервис
+3. **"Connect"** → скопируйте **DATABASE_PUBLIC_URL**
+
+Создайте `backend/.env`:
+
+```bash
+cd backend
+cp .env.example .env
+```
+
+Откройте `backend/.env` и вставьте DATABASE_PUBLIC_URL:
+
+```env
+NODE_ENV=development
+PORT=3001
+DATABASE_URL=postgresql://postgres:ваш_пароль@gondola.proxy.rlwy.net:59589/railway
+```
+
+### 3. Настройка Frontend
+
+Создайте `.env.local` в корне проекта:
+
+```bash
+cd ..  # Вернуться в корень
+cp .env.example .env.local
+```
+
+`.env.local` уже настроен правильно:
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001
+```
+
+### 4. Запуск
+
+**Терминал 1 - Backend:**
+```bash
+cd backend
+npm run start:dev
+```
+
+Backend: http://localhost:3001
+Health: http://localhost:3001/api/health
+
+**Терминал 2 - Frontend:**
+```bash
+npm run dev
+```
+
+Frontend: http://localhost:3000
+
+---
+
+## База данных (Railway PostgreSQL)
+
+### Преимущества:
+- ✅ Не нужно устанавливать PostgreSQL локально
+- ✅ Общая база для всей команды
+- ✅ Одинаковые данные на dev и production
+
+### TypeORM Auto-Sync
+
+Backend автоматически создаёт таблицы при запуске (в development):
+
+```typescript
+synchronize: NODE_ENV !== 'production'  // true в dev
+```
+
+При первом запуске TypeORM создаст все таблицы в Railway PostgreSQL.
+
+### Просмотр данных
+
+**Через psql:**
+```bash
+psql postgresql://postgres:password@gondola.proxy.rlwy.net:59589/railway
+```
+
+**Через GUI:**
+- TablePlus: https://tableplus.com
+- DBeaver: https://dbeaver.io
+
+---
+
+## API Endpoints
+
+### Health
+```
+GET http://localhost:3001/api/health
+```
+
+### Auth
+```
+POST /api/auth/phone
+POST /api/auth/phone/verify
+POST /api/auth/email
+POST /api/auth/email/verify
+```
+
+### Users
+```
+GET    /api/users
+GET    /api/users/:id
+PUT    /api/users/:id
+DELETE /api/users/:id
+```
+
+### Appeals
+```
+GET    /api/appeals
+POST   /api/appeals
+GET    /api/appeals/:id
+```
+
+---
 
 ## Структура проекта
 
 ```
 VAZ/
-├── app/              # Next.js frontend (React)
-├── backend/          # NestJS API
-├── components/       # UI компоненты
-├── lib/              # Утилиты и API клиент
-└── public/           # Статика
+├── backend/               # NestJS Backend
+│   ├── src/
+│   │   ├── auth/         # Lecar ID интеграция
+│   │   ├── users/        # Управление пользователями
+│   │   ├── appeals/      # Обращения
+│   │   └── health/       # Healthcheck
+│   ├── .env              # Локальные переменные
+│   └── package.json
+│
+├── app/                  # Next.js Pages
+│   ├── page.tsx          # Главная
+│   ├── auth/             # Авторизация
+│   └── api/              # API Routes
+│
+├── components/           # React компоненты
+├── lib/                  # Утилиты
+└── .env.local           # Frontend переменные
 ```
 
-## Запуск для разработки
+---
 
-### 1. Backend (NestJS API)
+## Переменные окружения
 
+### Backend (`backend/.env`)
+```env
+NODE_ENV=development
+PORT=3001
+DATABASE_URL=postgresql://postgres:...@gondola.proxy.rlwy.net:59589/railway
+```
+
+### Frontend (`.env.local`)
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001
+```
+
+---
+
+## Полезные команды
+
+### Backend
 ```bash
 cd backend
-
-# Создайте .env файл
-cp .env.example .env
-
-# Укажите DATABASE_URL (можно использовать любую PostgreSQL БД)
-# Для начала можно оставить как есть - будет ошибка подключения к БД,
-# но авторизация будет работать (OTP коды выводятся в консоль)
-
-# Установите зависимости (если еще не установлены)
-npm install
-
-# Запустите в dev режиме
-npm run start:dev
-```
-
-API будет доступен на `http://localhost:3001`
-
-**OTP коды будут выводиться в консоль backend:**
-```
-📱 OTP для +79991234567: 8234
-```
-
-### 2. Frontend (Next.js)
-
-```bash
-# В корне проекта
-
-# Создайте .env.local
-cp .env.example .env.local
-
-# Должно быть:
-# NEXT_PUBLIC_API_URL=http://localhost:3001
-
-# Запустите dev сервер
-npm run dev
-```
-
-Frontend будет доступен на `http://localhost:3000`
-
-## Тестирование
-
-1. Откройте `http://localhost:3000`
-2. Нажмите "Войти через Lecar ID"
-3. Введите телефон или email
-4. Проверьте консоль backend - там будет OTP код
-5. Введите код (например: `8234`)
-6. После входа заполните форму обращения
-
-## База данных
-
-### Локальная PostgreSQL (опционально)
-
-Если хотите полностью протестировать с БД:
-
-```bash
-# Docker
-docker run -d \
-  --name avtovaz-postgres \
-  -e POSTGRES_PASSWORD=dev \
-  -e POSTGRES_DB=avtovaz \
-  -p 5432:5432 \
-  postgres:14
-
-# В backend/.env укажите:
-DATABASE_URL=postgresql://postgres:dev@localhost:5432/avtovaz
-```
-
-После запуска backend автоматически создаст таблицы (synchronize: true в dev режиме).
-
-## Проверка работы
-
-### Backend API
-
-```bash
-# Health check
-curl http://localhost:3001
-
-# Request OTP code
-curl -X POST http://localhost:3001/auth/request-code \
-  -H "Content-Type: application/json" \
-  -d '{"contact": "+79991234567", "method": "phone"}'
+npm run start:dev      # Dev с hot-reload
+npm run build          # Production build
+npm start              # Запуск production
 ```
 
 ### Frontend
+```bash
+npm run dev            # Dev сервер
+npm run build          # Production build
+npm start              # Запуск production
+npm run lint           # Проверка кода
+```
 
-1. Авторизация работает
-2. OTP коды приходят в консоль backend
-3. После входа форма обращения сохраняет данные в БД
+---
 
 ## Troubleshooting
 
 ### Backend не запускается
 
-- Проверьте что порт 3001 свободен
-- Если ошибка подключения к БД - это нормально для начала, OTP всё равно будет работать
+**Cannot connect to database:**
+- Проверьте DATABASE_URL в `backend/.env`
+- Проверьте что Railway PostgreSQL запущен
 
-### Frontend не подключается к API
+**Port 3001 already in use:**
+```bash
+lsof -i :3001
+kill -9 <PID>
+```
 
-- Проверьте `.env.local` - должен быть `NEXT_PUBLIC_API_URL=http://localhost:3001`
-- Проверьте что backend запущен
-- Откройте DevTools → Network - там должны быть запросы к localhost:3001
+### Frontend не подключается
 
-### CORS ошибки
+- Проверьте http://localhost:3001/api/health
+- Проверьте NEXT_PUBLIC_API_URL в `.env.local`
 
-- Backend уже настроен для работы с localhost:3000
-- Если используете другой порт - измените в `backend/src/main.ts`
+---
 
-## Следующие шаги
+## Деплой
 
-После локального тестирования:
-1. Создайте PostgreSQL на Timeweb Cloud
-2. Задеплойте backend на Timeweb Cloud App
-3. Обновите `NEXT_PUBLIC_API_URL` на продакшн URL
-4. Frontend останется на GitHub Pages или также на Timeweb
+После разработки:
+
+```bash
+git add .
+git commit -m "Описание изменений"
+git push
+```
+
+Railway автоматически задеплоит! 🚀
+
+---
+
+## Полезные ссылки
+
+- [NestJS Docs](https://docs.nestjs.com)
+- [Next.js Docs](https://nextjs.org/docs)
+- [Railway Docs](https://docs.railway.app)
+- [TypeORM Docs](https://typeorm.io)
