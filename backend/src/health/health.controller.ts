@@ -1,12 +1,13 @@
 import { Controller, Get } from '@nestjs/common';
 
-@Controller('health')
+@Controller('api/health')
 export class HealthController {
   @Get()
   check() {
     return {
       status: 'ok',
       timestamp: new Date().toISOString(),
+      service: 'vaz-backend',
     };
   }
 }
