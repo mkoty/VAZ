@@ -17,6 +17,11 @@ export class AuthService {
       ? await this.usersService.findByPhone(contact)
       : await this.usersService.findByEmail(contact);
 
+    console.log(`🔍 Поиск пользователя ${method}=${contact}: ${user ? 'найден ✅' : 'не найден ❌'}`);
+    if (user) {
+      console.log(`👤 Пользователь: ID=${user.id}, Email=${user.email}, Phone=${user.phone}`);
+    }
+
     // Генерируем код
     const code = this.generateOTP();
     this.otpStorage.set(contact, code);
@@ -127,6 +132,8 @@ export class AuthService {
       email: userData.email,
       isVerified: true,
     });
+
+    console.log(`✅ Пользователь зарегистрирован: ID=${user.id}, Email=${user.email}, Phone=${user.phone}`);
 
     return {
       success: true,

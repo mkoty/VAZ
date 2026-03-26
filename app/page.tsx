@@ -14,6 +14,8 @@ export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [userName, setUserName] = useState("")
   const [userId, setUserId] = useState("")
+  const [userEmail, setUserEmail] = useState("")
+  const [userPhone, setUserPhone] = useState("")
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
@@ -24,6 +26,8 @@ export default function Home() {
       const userData = JSON.parse(user)
       setUserName(userData.name || userData.firstName + ' ' + userData.lastName)
       setUserId(userData.id)
+      setUserEmail(userData.email || "")
+      setUserPhone(userData.phone || "")
       setIsAuthenticated(true)
     }
   }, [])
@@ -156,6 +160,7 @@ export default function Home() {
                           id="email"
                           type="email"
                           placeholder="example@mail.ru"
+                          defaultValue={userEmail}
                           required
                         />
                       </div>
@@ -165,6 +170,7 @@ export default function Home() {
                           id="phone"
                           type="tel"
                           placeholder="+7 (___) ___-__-__"
+                          defaultValue={userPhone}
                         />
                       </div>
                     </div>
