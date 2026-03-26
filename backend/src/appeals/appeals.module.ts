@@ -5,7 +5,7 @@ import { AppealsService } from './appeals.service';
 import { AppealsController } from './appeals.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Appeal])],
+  imports: process.env.DATABASE_URL ? [TypeOrmModule.forFeature([Appeal])] : [],
   providers: [AppealsService],
   controllers: [AppealsController],
 })

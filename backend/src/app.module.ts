@@ -10,17 +10,20 @@ import { AppealsModule } from './appeals/appeals.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        url: configService.get('DATABASE_URL'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: configService.get('NODE_ENV') !== 'production',
-        logging: configService.get('NODE_ENV') === 'development',
+    // TypeORM подключается только если указан DATABASE_URL
+    ...(process.env.DATABASE_URL ? [
+      TypeOrmModule.forRootAsync({
+        imports: [ConfigModule],
+        useFactory: (configService: ConfigService) => ({
+          type: 'postgres',
+          url: configService.get('DATABASE_URL'),
+          entities: [__dirname + '/**/*.entity{.ts,.js}'],
+          synchronize: configService.get('NODE_ENV') !== 'production',
+          logging: configService.get('NODE_ENV') === 'development',
+        }),
+        inject: [ConfigService],
       }),
-      inject: [ConfigService],
-    }),
+    ] : []),
     AuthModule,
     UsersModule,
     AppealsModule,

@@ -5,7 +5,7 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: process.env.DATABASE_URL ? [TypeOrmModule.forFeature([User])] : [],
   providers: [UsersService],
   controllers: [UsersController],
   exports: [UsersService],
