@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
+    "build:timeweb": "tsc",
     "start": "node dist/main",
     "start:dev": "tsc && node dist/main",
     "start:prod": "node dist/main",
