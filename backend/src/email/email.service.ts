@@ -29,15 +29,20 @@ export class EmailService {
       logger: true, // Включаем логирование
     });
 
-    // Проверяем подключение при старте
+    // Проверяем подключение при старте (не блокируем запуск приложения)
     if (emailUser && emailPassword) {
-      this.transporter.verify((error, success) => {
-        if (error) {
-          console.error('❌ Ошибка подключения к SMTP:', error);
-        } else {
-          console.log('✅ SMTP сервер готов к отправке писем');
-        }
-      });
+      this.verifyConnection();
+    }
+  }
+
+  private async verifyConnection() {
+    try {
+      await this.transporter.verify();
+      console.log('✅ SMTP сервер готов к отправке писем');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      console.error('❌ Ошибка подключения к SMTP:', message);
+      console.error('Убедитесь что EMAIL_USER и EMAIL_PASSWORD настроены правильно');
     }
   }
 

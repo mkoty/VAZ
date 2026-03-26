@@ -160,9 +160,6 @@ export default function AuthPage() {
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Отправка...' : 'Получить код'}
                 </Button>
-                <p className="text-xs text-center text-muted-foreground">
-                  Демо: код 1234, 70% найдёт пользователя
-                </p>
               </form>
             </CardContent>
           </>
