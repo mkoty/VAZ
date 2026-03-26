@@ -7,7 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "export": "next build && next export"
+    "build:github": "DEPLOY_TARGET=github next build",
+    "build:timeweb": "DEPLOY_TARGET=timeweb next build"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   },
   "dependencies": {
     "react": "^18.3.1",

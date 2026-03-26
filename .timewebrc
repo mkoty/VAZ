@@ -1,0 +1,11 @@
+{
+  "name": "avtovaz-reception",
+  "runtime": "nodejs",
+  "buildCommand": "npm run build:timeweb",
+  "startCommand": "npm start",
+  "port": 3000,
+  "envVars": {
+    "NODE_ENV": "production",
+    "DEPLOY_TARGET": "timeweb"
+  }
+}
