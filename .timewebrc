@@ -1,11 +1,13 @@
 {
   "name": "avtovaz-reception",
   "runtime": "nodejs",
-  "buildCommand": "npm run build:timeweb",
+  "buildCommand": "npm install && npm run build:timeweb",
   "startCommand": "npm start",
   "port": 3000,
+  "outputDirectory": ".next",
   "envVars": {
     "NODE_ENV": "production",
-    "DEPLOY_TARGET": "timeweb"
+    "DEPLOY_TARGET": "timeweb",
+    "NEXT_PUBLIC_API_URL": "https://mkoty-vaz-8c2f.twc1.net"
   }
 }
