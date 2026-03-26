@@ -15,11 +15,11 @@
    - Тариф: **Базовый** (~200₽/месяц)
    - **Публичный IP**: ❌ **НЕ включайте** (экономия ~300₽/мес)
 4. Сохраните данные подключения:
-   - Host (внутренний): `postgresql-xxxxx.timeweb.cloud`
+   - Host (внутренний): `192.168.0.4`
    - Port: `5432`
-   - Database name: `avtovaz`
-   - Username: (будет предоставлен)
-   - Password: (будет предоставлен)
+   - Database name: `default_db`
+   - Username: gen_user
+   - Password: i7Y!H)$4eKnZf,
 
 > 💡 **Публичный IP не нужен** — БД и приложение в одной внутренней сети Timeweb.
 > Для локальной разработки используем mock-данные (localStorage).
@@ -41,7 +41,7 @@
 ```env
 NODE_ENV=production
 DEPLOY_TARGET=timeweb
-DATABASE_URL=postgresql://username:password@host:port/database_name
+DATABASE_URL=postgresql://gen_user:i7Y!H)%244eKnZf%2C@192.168.0.4:5432/default_db
 ```
 
 ## Шаг 5: Настройка сборки
