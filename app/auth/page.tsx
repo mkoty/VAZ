@@ -95,14 +95,11 @@ export default function AuthPage() {
         if (result.requiresRegistration || !result.userExists) {
           // Код верифицирован успешно, но пользователь не найден
           setCodeAlreadyVerified(true) // Устанавливаем флаг - код проверен
-          setError('Пользователь не найден. Перенаправление на регистрацию...')
           // Переходим на регистрацию через 1.5 секунды
-          setTimeout(() => {
-            setStep('register')
-            if (authMethod === 'email') setEmail(contact)
-            if (authMethod === 'phone') setPhone(contact)
-            setIsVerifying(false) // Сброс флага после перехода
-          }, 1500)
+          setStep('register')
+          if (authMethod === 'email') setEmail(contact)
+          if (authMethod === 'phone') setPhone(contact)
+          setIsVerifying(false) // Сброс флага после перехода
         } else {
           // Успешный вход
           localStorage.setItem('user', JSON.stringify(result.user))

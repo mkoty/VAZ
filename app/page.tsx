@@ -108,9 +108,6 @@ export default function Home() {
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-6 space-y-3">
-              <p className="text-center mb-6 text-muted-foreground">
-                Войдите через телефон или email
-              </p>
               <Button
                 size="lg"
                 className="w-full"
