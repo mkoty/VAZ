@@ -68,7 +68,8 @@ export default function AuthPage() {
       setCountdownEndTime(endTime)
     } catch (err) {
       console.error('Ошибка отправки кода:', err)
-      setError('Ошибка отправки кода. Попробуйте еще раз.')
+      const errorMessage = err instanceof Error ? err.message : 'Неизвестная ошибка'
+      setError(`Ошибка отправки кода: ${errorMessage}`)
       setCodeRequested(false)
     } finally {
       setLoading(false)
