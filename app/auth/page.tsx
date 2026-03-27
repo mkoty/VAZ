@@ -21,6 +21,7 @@ export default function AuthPage() {
   const [countdown, setCountdown] = useState(0)
   const [codeRequested, setCodeRequested] = useState(false)
   const [countdownEndTime, setCountdownEndTime] = useState<number | null>(null)
+  const [isVerifying, setIsVerifying] = useState(false) // Защита от повторных вызовов
 
   // Данные регистрации
   const [firstName, setFirstName] = useState('')
@@ -74,8 +75,16 @@ export default function AuthPage() {
 
   const handleVerifyCode = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Защита от повторных вызовов
+    if (isVerifying) {
+      console.log('⚠️ Верификация уже выполняется, пропускаем повторный вызов')
+      return
+    }
+
     setError('')
     setLoading(true)
+    setIsVerifying(true)
 
     try {
       const result = await api.verifyCode(contact, code, authMethod)
@@ -89,17 +98,20 @@ export default function AuthPage() {
             setStep('register')
             if (authMethod === 'email') setEmail(contact)
             if (authMethod === 'phone') setPhone(contact)
+            setIsVerifying(false) // Сброс флага после перехода
           }, 1500)
         } else {
           // Успешный вход
           localStorage.setItem('user', JSON.stringify(result.user))
           localStorage.setItem('token', result.token)
           router.push('/')
+          setIsVerifying(false)
         }
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Неверный код'
       setError(errorMessage)
+      setIsVerifying(false) // Сброс флага при ошибке
     } finally {
       setLoading(false)
     }

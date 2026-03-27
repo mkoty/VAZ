@@ -68,7 +68,6 @@ export class AuthService {
     }
 
     console.log(`✅ Код верифицирован успешно для ${contact}`);
-    this.otpStorage.delete(contact);
 
     const user = method === 'phone'
       ? await this.usersService.findByPhone(contact)
@@ -76,6 +75,7 @@ export class AuthService {
 
     if (!user) {
       console.log(`⚠️  Пользователь ${method}=${contact} не найден в БД - требуется регистрация`);
+      // НЕ удаляем код - он может понадобиться для регистрации
       return {
         success: true,
         userExists: false,
@@ -84,6 +84,8 @@ export class AuthService {
       };
     }
 
+    // Удаляем код только при успешном входе
+    this.otpStorage.delete(contact);
     console.log(`✅ Пользователь найден: ID=${user.id}, Email=${user.email}`);
 
     return {
