@@ -55,8 +55,8 @@ export default function AuthPage() {
     setError('')
     setCodeRequested(true)
 
-    // Запускаем таймер на 60 секунд (используем время окончания)
-    const endTime = Date.now() + 60000
+    // Запускаем таймер на 30 секунд (используем время окончания)
+    const endTime = Date.now() + 30000
     setCountdownEndTime(endTime)
 
     // Оптимистично переходим на страницу ввода кода СРАЗУ
@@ -147,8 +147,8 @@ export default function AuthPage() {
     }
 
     // Обычная регистрация с отправкой кода
-    // Запускаем таймер на 60 секунд (используем время окончания)
-    const endTime = Date.now() + 60000
+    // Запускаем таймер на 30 секунд (используем время окончания)
+    const endTime = Date.now() + 30000
     setCountdownEndTime(endTime)
 
     // Оптимистично переходим на страницу ввода кода
