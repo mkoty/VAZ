@@ -54,20 +54,25 @@ export default function AuthPage() {
     if (e) e.preventDefault()
     setError('')
     setCodeRequested(true)
+    setLoading(true)
 
-    // Запускаем таймер на 30 секунд (используем время окончания)
-    const endTime = Date.now() + 30000
-    setCountdownEndTime(endTime)
+    try {
+      // Отправляем запрос и ЖДЕМ ответа (важно для мобильных устройств)
+      await api.requestCode(contact, authMethod)
 
-    // Оптимистично переходим на страницу ввода кода СРАЗУ
-    // Пользователь не ждёт ответа сервера
-    setStep('code')
+      // Только после успешной отправки переходим на следующий шаг
+      setStep('code')
 
-    // Запрос отправляется в фоне (не блокирует UI)
-    api.requestCode(contact, authMethod).catch((err) => {
+      // Запускаем таймер на 60 секунд
+      const endTime = Date.now() + 60000
+      setCountdownEndTime(endTime)
+    } catch (err) {
       console.error('Ошибка отправки кода:', err)
-      // При ошибке пользователь может нажать "Отправить код повторно"
-    })
+      setError('Ошибка отправки кода. Попробуйте еще раз.')
+      setCodeRequested(false)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleResendCode = async () => {
