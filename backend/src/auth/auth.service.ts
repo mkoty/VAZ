@@ -1,12 +1,16 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/users.service';
 import { EmailService } from '../email/email.service';
+import { SendGridService } from '../email/sendgrid.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private emailService: EmailService,
+    private sendGridService: SendGridService,
+    private configService: ConfigService,
   ) {}
 
   // Mock OTP storage (в продакшене использовать Redis)
@@ -33,12 +37,19 @@ export class AuthService {
       console.log(`🆕 Сгенерирован новый код для ${contact}`);
     }
 
-    // Отправляем код на email (всегда используем email для верификации)
+    // Отправляем код на email (используем SendGrid если настроен, иначе SMTP)
     const email = method === 'email' ? contact : user?.email;
     if (email) {
       try {
-        await this.emailService.sendVerificationCode(email, code);
-        console.log(`✅ Код отправлен на email ${email}`);
+        const useSendGrid = !!this.configService.get<string>('SENDGRID_API_KEY');
+
+        if (useSendGrid) {
+          await this.sendGridService.sendVerificationCode(email, code);
+          console.log(`✅ Код отправлен на email ${email} через SendGrid`);
+        } else {
+          await this.emailService.sendVerificationCode(email, code);
+          console.log(`✅ Код отправлен на email ${email} через SMTP`);
+        }
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Unknown error';
         console.error(`❌ Ошибка отправки email: ${message}`);
