@@ -63,8 +63,8 @@ export default function AuthPage() {
       // Только после успешной отправки переходим на следующий шаг
       setStep('code')
 
-      // Запускаем таймер на 60 секунд
-      const endTime = Date.now() + 60000
+      // Запускаем таймер на 20 секунд
+      const endTime = Date.now() + 20000
       setCountdownEndTime(endTime)
     } catch (err) {
       console.error('Ошибка отправки кода:', err)
