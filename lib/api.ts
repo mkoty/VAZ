@@ -1,4 +1,13 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+// Production backend URL (Railway)
+const PRODUCTION_API_URL = 'https://vaz-backend-production-8550.up.railway.app';
+
+// Используем production URL по умолчанию, localhost только для явной локальной разработки
+const API_URL = process.env.NEXT_PUBLIC_API_URL || PRODUCTION_API_URL;
+
+// Для отладки - показываем какой URL используется
+if (typeof window !== 'undefined') {
+  console.log('🔗 API URL:', API_URL);
+}
 
 export const api = {
   // Auth endpoints
