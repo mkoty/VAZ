@@ -38,30 +38,18 @@ export default function AuthPage() {
   const handleRequestCode = async (e?: React.FormEvent) => {
     if (e) e.preventDefault()
     setError('')
-    setLoading(true)
     setCodeRequested(true)
     setCountdown(60) // Запускаем таймер на 60 секунд сразу
 
-    // Оптимистично переходим на страницу ввода кода
-    // Пользователь не будет ждать ответа сервера
+    // Оптимистично переходим на страницу ввода кода СРАЗУ
+    // Пользователь не ждёт ответа сервера
     setStep('code')
-    setLoading(false)
 
-    // Запрос отправляется в фоне
-    try {
-      const result = await api.requestCode(contact, authMethod)
-
-      // Если пользователь не найден - переводим на регистрацию
-      if (!result.userExists) {
-        setStep('register')
-        if (authMethod === 'phone') setPhone(contact)
-        if (authMethod === 'email') setEmail(contact)
-      }
-    } catch (err) {
-      // При ошибке показываем сообщение, но оставляем на странице ввода кода
-      // Пользователь может попробовать запросить код повторно
+    // Запрос отправляется в фоне (не блокирует UI)
+    api.requestCode(contact, authMethod).catch((err) => {
       console.error('Ошибка отправки кода:', err)
-    }
+      // При ошибке пользователь может нажать "Отправить код повторно"
+    })
   }
 
   const handleResendCode = async () => {
@@ -82,7 +70,20 @@ export default function AuthPage() {
         router.push('/')
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Неверный код')
+      const errorMessage = err instanceof Error ? err.message : 'Неверный код'
+
+      // Если пользователь не найден - предлагаем регистрацию
+      if (errorMessage.includes('не найден') || errorMessage.includes('Пользователь не найден')) {
+        setError('Пользователь не найден. Пожалуйста, зарегистрируйтесь.')
+        // Переходим на регистрацию через 2 секунды
+        setTimeout(() => {
+          setStep('register')
+          if (authMethod === 'email') setEmail(contact)
+          if (authMethod === 'phone') setPhone(contact)
+        }, 2000)
+      } else {
+        setError(errorMessage)
+      }
     } finally {
       setLoading(false)
     }
@@ -262,13 +263,22 @@ export default function AuthPage() {
                   )}
                 </div>
 
-                <Button type="button" variant="ghost" onClick={() => {
-                  setStep('choose')
-                  setCodeRequested(false)
-                  setCountdown(0)
-                }} className="w-full">
-                  Назад
-                </Button>
+                <div className="flex gap-2">
+                  <Button type="button" variant="ghost" onClick={() => {
+                    setStep('choose')
+                    setCodeRequested(false)
+                    setCountdown(0)
+                  }} className="flex-1">
+                    Назад
+                  </Button>
+                  <Button type="button" variant="outline" onClick={() => {
+                    setStep('register')
+                    if (authMethod === 'email') setEmail(contact)
+                    if (authMethod === 'phone') setPhone(contact)
+                  }} className="flex-1">
+                    Регистрация
+                  </Button>
+                </div>
               </form>
             </CardContent>
           </>
