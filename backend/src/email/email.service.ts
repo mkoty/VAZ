@@ -19,8 +19,8 @@ export class EmailService {
 
     this.transporter = nodemailer.createTransport({
       host: isYandex ? 'smtp.yandex.ru' : 'smtp.gmail.com',
-      port: isYandex ? 465 : 587,
-      secure: isYandex, // true для Yandex (465), false для Gmail (587)
+      port: 587,
+      secure: false, // true для Yandex (465), false для Gmail (587)
       auth: {
         user: emailUser,
         pass: emailPassword,
