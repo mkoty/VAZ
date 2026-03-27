@@ -97,15 +97,16 @@ export class EmailService {
       text: `Обращение успешно создано. Ваше обращение будет рассмотрено в ближайшее время. Регистрационный номер: ${appealNumber}.`,
     };
 
-    try {
-      const info = await this.transporter.sendMail(mailOptions);
-      console.log(`✅ Подтверждение обращения отправлено на ${email}`);
-      console.log('Message ID:', info.messageId);
-    } catch (error) {
-      console.error('❌ Ошибка отправки email:', error);
-      console.error('Детали ошибки:', JSON.stringify(error, null, 2));
-      const message = error instanceof Error ? error.message : 'Unknown error';
-      throw new Error(`Failed to send appeal confirmation: ${message}`);
-    }
+    // TODO: потом настроить отправку писем и проверку
+    // try {
+    //   const info = await this.transporter.sendMail(mailOptions);
+    //   console.log(`✅ Подтверждение обращения отправлено на ${email}`);
+    //   console.log('Message ID:', info.messageId);
+    // } catch (error) {
+    //   console.error('❌ Ошибка отправки email:', error);
+    //   console.error('Детали ошибки:', JSON.stringify(error, null, 2));
+    //   const message = error instanceof Error ? error.message : 'Unknown error';
+    //   throw new Error(`Failed to send appeal confirmation: ${message}`);
+    // }
   }
 }
