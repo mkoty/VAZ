@@ -22,6 +22,7 @@ export default function AuthPage() {
   const [codeRequested, setCodeRequested] = useState(false)
   const [countdownEndTime, setCountdownEndTime] = useState<number | null>(null)
   const [isVerifying, setIsVerifying] = useState(false) // Защита от повторных вызовов
+  const [codeAlreadyVerified, setCodeAlreadyVerified] = useState(false) // Код уже проверен, можно регистрироваться без повторной верификации
 
   // Данные регистрации
   const [firstName, setFirstName] = useState('')
@@ -92,6 +93,8 @@ export default function AuthPage() {
       if (result.success) {
         // Проверяем, требуется ли регистрация
         if (result.requiresRegistration || !result.userExists) {
+          // Код верифицирован успешно, но пользователь не найден
+          setCodeAlreadyVerified(true) // Устанавливаем флаг - код проверен
           setError('Пользователь не найден. Перенаправление на регистрацию...')
           // Переходим на регистрацию через 1.5 секунды
           setTimeout(() => {
@@ -122,6 +125,31 @@ export default function AuthPage() {
     setError('')
     setLoading(true)
 
+    // Если код уже был верифицирован - сразу создаем пользователя
+    if (codeAlreadyVerified) {
+      try {
+        const result = await api.confirmRegistration({
+          firstName,
+          lastName,
+          phone,
+          email,
+          code, // Используем уже верифицированный код
+        })
+
+        if (result.success) {
+          localStorage.setItem('user', JSON.stringify(result.user))
+          localStorage.setItem('token', result.token)
+          router.push('/')
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Ошибка регистрации')
+      } finally {
+        setLoading(false)
+      }
+      return
+    }
+
+    // Обычная регистрация с отправкой кода
     // Запускаем таймер на 60 секунд (используем время окончания)
     const endTime = Date.now() + 60000
     setCountdownEndTime(endTime)
@@ -312,7 +340,9 @@ export default function AuthPage() {
             <CardHeader>
               <CardTitle>Регистрация</CardTitle>
               <CardDescription>
-                Пользователь не найден. Заполните данные для регистрации
+                {codeAlreadyVerified
+                  ? 'Код подтвержден ✓ Заполните данные для завершения регистрации'
+                  : 'Пользователь не найден. Заполните данные для регистрации'}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -365,7 +395,7 @@ export default function AuthPage() {
                 {error && <p className="text-sm text-red-600">{error}</p>}
 
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Отправка...' : 'Зарегистрироваться'}
+                  {loading ? 'Регистрация...' : (codeAlreadyVerified ? 'Завершить регистрацию' : 'Зарегистрироваться')}
                 </Button>
                 <Button type="button" variant="ghost" onClick={() => {
                   setStep('choose')
