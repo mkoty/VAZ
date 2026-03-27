@@ -58,6 +58,11 @@
     --chart-5: 340 75% 55%;
   }
 }
+@media (max-width: 499px) {
+  .user-info-header {
+    display: none;
+  }
+}
 
 @layer base {
   * {

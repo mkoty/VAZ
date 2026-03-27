@@ -83,7 +83,7 @@ export default function Home() {
             </div>
             {isAuthenticated && (
               <div className="flex items-center gap-4">
-                <span className="text-sm">Здравствуйте, {userName}</span>
+                <span className="text-sm user-info-header">Здравствуйте, {userName}</span>
                 <Button
                   variant="outline"
                   size="sm"
