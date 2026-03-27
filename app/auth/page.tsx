@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -18,6 +18,7 @@ export default function AuthPage() {
   const [code, setCode] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [countdown, setCountdown] = useState(0)
 
   // Данные регистрации
   const [firstName, setFirstName] = useState('')
@@ -25,8 +26,16 @@ export default function AuthPage() {
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
 
-  const handleRequestCode = async (e: React.FormEvent) => {
-    e.preventDefault()
+  // Таймер для повторной отправки кода
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [countdown])
+
+  const handleRequestCode = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
     setError('')
     setLoading(true)
 
@@ -35,6 +44,7 @@ export default function AuthPage() {
 
       if (result.userExists) {
         setStep('code')
+        setCountdown(60) // Запускаем таймер на 60 секунд
       } else {
         // Пользователь не найден - на регистрацию
         setStep('register')
@@ -46,6 +56,10 @@ export default function AuthPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleResendCode = async () => {
+    await handleRequestCode()
   }
 
   const handleVerifyCode = async (e: React.FormEvent) => {
@@ -68,19 +82,24 @@ export default function AuthPage() {
     }
   }
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleRegister = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
     setError('')
     setLoading(true)
 
     try {
       await api.register({ firstName, lastName, phone, email })
       setStep('registerCode')
+      setCountdown(60) // Запускаем таймер на 60 секунд
     } catch (err) {
       setError('Ошибка регистрации')
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleResendRegisterCode = async () => {
+    await handleRegister()
   }
 
   const handleConfirmRegistration = async (e: React.FormEvent) => {
@@ -195,6 +214,25 @@ export default function AuthPage() {
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Проверка...' : 'Войти'}
                 </Button>
+
+                <div className="text-center">
+                  {countdown > 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      Отправить код повторно можно через {countdown} сек
+                    </p>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="link"
+                      onClick={handleResendCode}
+                      disabled={loading}
+                      className="text-lada-blue"
+                    >
+                      Отправить код повторно
+                    </Button>
+                  )}
+                </div>
+
                 <Button type="button" variant="ghost" onClick={() => setStep('choose')} className="w-full">
                   Назад
                 </Button>
@@ -299,6 +337,24 @@ export default function AuthPage() {
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Проверка...' : 'Завершить регистрацию'}
                 </Button>
+
+                <div className="text-center">
+                  {countdown > 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      Отправить код повторно можно через {countdown} сек
+                    </p>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="link"
+                      onClick={handleResendRegisterCode}
+                      disabled={loading}
+                      className="text-lada-blue"
+                    >
+                      Отправить код повторно
+                    </Button>
+                  )}
+                </div>
               </form>
             </CardContent>
           </>

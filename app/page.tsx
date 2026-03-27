@@ -20,6 +20,7 @@ export default function Home() {
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [agreed, setAgreed] = useState(false)
 
   useEffect(() => {
     const user = localStorage.getItem('user')
@@ -59,6 +60,7 @@ export default function Home() {
     try {
       await api.createAppeal(formData)
       setSubmitted(true)
+      setAgreed(false) // Сбрасываем чекбокс
       form.reset()
     } catch (err) {
       setError('Ошибка отправки обращения')
@@ -235,7 +237,8 @@ export default function Home() {
                         type="checkbox"
                         id="agreement"
                         className="mt-1 h-4 w-4 rounded border-gray-300 text-lada-blue focus:ring-lada-blue"
-                        required
+                        checked={agreed}
+                        onChange={(e) => setAgreed(e.target.checked)}
                       />
                       <Label htmlFor="agreement" className="text-sm font-normal cursor-pointer">
                         Я согласен на обработку персональных данных и подтверждаю достоверность
@@ -245,7 +248,7 @@ export default function Home() {
 
                     {error && <p className="text-sm text-red-600">{error}</p>}
 
-                    <Button type="submit" className="w-full" size="lg" disabled={loading}>
+                    <Button type="submit" className="w-full" size="lg" disabled={loading || !agreed}>
                       {loading ? 'Отправка...' : 'Отправить обращение'}
                     </Button>
                   </form>
