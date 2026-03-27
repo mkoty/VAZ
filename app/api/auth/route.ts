@@ -61,22 +61,23 @@ export async function POST(request: Request) {
 
     case 'confirmRegistration':
       // POST /api/cdp/lecar-id/v1/customer:register
+      // TODO: 1234 убрать и сделать с авторизацией
       // Проверка кода и создание пользователя
-      if (code === '1234') {
-        return NextResponse.json({
-          success: true,
-          token: 'mock-jwt-token-' + Date.now(),
-          user: {
-            id: 'user-' + Date.now(),
-            ...userData
-          }
-        });
-      } else {
-        return NextResponse.json({
-          success: false,
-          message: 'Неверный код'
-        }, { status: 400 });
-      }
+      // if (code === '1234') {
+      return NextResponse.json({
+        success: true,
+        token: 'mock-jwt-token-' + Date.now(),
+        user: {
+          id: 'user-' + Date.now(),
+          ...userData
+        }
+      });
+      // } else {
+      //   return NextResponse.json({
+      //     success: false,
+      //     message: 'Неверный код'
+      //   }, { status: 400 });
+      // }
 
     default:
       return NextResponse.json({
