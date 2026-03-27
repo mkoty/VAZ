@@ -122,8 +122,17 @@ npm run dev
 
 ## 📖 Документация
 
+### Деплой и настройка
 - [DEPLOY.md](DEPLOY.md) - Полная инструкция по деплою на GitHub Pages
-- [MOBILE_TESTING.md](MOBILE_TESTING.md) - Тестирование на реальных мобильных устройствах
-- [MOBILE_QUICK_START.md](MOBILE_QUICK_START.md) - Быстрый старт для мобильного тестирования
+- [GITHUB_PAGES_SETUP.md](GITHUB_PAGES_SETUP.md) - Быстрая настройка GitHub Pages
+- [QUICK_RAILWAY_EMAIL_FIX.md](QUICK_RAILWAY_EMAIL_FIX.md) - ⚡ Настройка email на Railway (3 минуты)
+- [RAILWAY_EMAIL_SETUP.md](RAILWAY_EMAIL_SETUP.md) - Подробная настройка email на Railway
+
+### Разработка и тестирование
 - [LOCAL_DEVELOPMENT.md](LOCAL_DEVELOPMENT.md) - Локальная разработка
+- [MOBILE_QUICK_START.md](MOBILE_QUICK_START.md) - Быстрый старт для мобильного тестирования
+- [MOBILE_TESTING.md](MOBILE_TESTING.md) - Тестирование на реальных мобильных устройствах
+- [MOBILE_FIX.md](MOBILE_FIX.md) - Исправление API URL для мобильных устройств
+
+### Техническая документация
 - [CLAUDE.md](CLAUDE.md) - Описание алгоритма Lecar ID
