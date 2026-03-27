@@ -19,6 +19,7 @@ export default function AuthPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [countdown, setCountdown] = useState(0)
+  const [codeRequested, setCodeRequested] = useState(false)
 
   // Данные регистрации
   const [firstName, setFirstName] = useState('')
@@ -41,10 +42,11 @@ export default function AuthPage() {
 
     try {
       const result = await api.requestCode(contact, authMethod)
+      setCodeRequested(true)
+      setCountdown(60) // Запускаем таймер на 60 секунд
 
       if (result.userExists) {
         setStep('code')
-        setCountdown(60) // Запускаем таймер на 60 секунд
       } else {
         // Пользователь не найден - на регистрацию
         setStep('register')
@@ -53,6 +55,7 @@ export default function AuthPage() {
       }
     } catch (err) {
       setError('Ошибка соединения с сервером')
+      setCodeRequested(false)
     } finally {
       setLoading(false)
     }
@@ -178,9 +181,29 @@ export default function AuthPage() {
 
                 {error && <p className="text-sm text-red-600">{error}</p>}
 
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button type="submit" className="w-full" disabled={loading || (codeRequested && countdown > 0)}>
                   {loading ? 'Отправка...' : 'Получить код'}
                 </Button>
+
+                {codeRequested && (
+                  <div className="text-center">
+                    {countdown > 0 ? (
+                      <p className="text-sm text-muted-foreground">
+                        Отправить код повторно можно через {countdown} сек
+                      </p>
+                    ) : (
+                      <Button
+                        type="button"
+                        variant="link"
+                        onClick={handleResendCode}
+                        disabled={loading}
+                        className="text-lada-blue"
+                      >
+                        Отправить код повторно
+                      </Button>
+                    )}
+                  </div>
+                )}
               </form>
             </CardContent>
           </>
@@ -233,7 +256,11 @@ export default function AuthPage() {
                   )}
                 </div>
 
-                <Button type="button" variant="ghost" onClick={() => setStep('choose')} className="w-full">
+                <Button type="button" variant="ghost" onClick={() => {
+                  setStep('choose')
+                  setCodeRequested(false)
+                  setCountdown(0)
+                }} className="w-full">
                   Назад
                 </Button>
               </form>
@@ -301,7 +328,11 @@ export default function AuthPage() {
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Отправка...' : 'Зарегистрироваться'}
                 </Button>
-                <Button type="button" variant="ghost" onClick={() => setStep('choose')} className="w-full">
+                <Button type="button" variant="ghost" onClick={() => {
+                  setStep('choose')
+                  setCodeRequested(false)
+                  setCountdown(0)
+                }} className="w-full">
                   Назад
                 </Button>
               </form>
