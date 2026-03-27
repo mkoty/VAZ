@@ -20,6 +20,7 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false)
   const [countdown, setCountdown] = useState(0)
   const [codeRequested, setCodeRequested] = useState(false)
+  const [countdownEndTime, setCountdownEndTime] = useState<number | null>(null)
 
   // Данные регистрации
   const [firstName, setFirstName] = useState('')
@@ -27,19 +28,34 @@ export default function AuthPage() {
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
 
-  // Таймер для повторной отправки кода
+  // Таймер для повторной отправки кода (работает даже при переключении вкладок)
   useEffect(() => {
-    if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000)
-      return () => clearTimeout(timer)
+    if (!countdownEndTime) return
+
+    const updateCountdown = () => {
+      const now = Date.now()
+      const remaining = Math.max(0, Math.ceil((countdownEndTime - now) / 1000))
+      setCountdown(remaining)
+
+      if (remaining === 0) {
+        setCountdownEndTime(null)
+      }
     }
-  }, [countdown])
+
+    updateCountdown() // Сразу обновляем
+    const interval = setInterval(updateCountdown, 100) // Проверяем каждые 100мс для точности
+
+    return () => clearInterval(interval)
+  }, [countdownEndTime])
 
   const handleRequestCode = async (e?: React.FormEvent) => {
     if (e) e.preventDefault()
     setError('')
     setCodeRequested(true)
-    setCountdown(60) // Запускаем таймер на 60 секунд сразу
+
+    // Запускаем таймер на 60 секунд (используем время окончания)
+    const endTime = Date.now() + 60000
+    setCountdownEndTime(endTime)
 
     // Оптимистично переходим на страницу ввода кода СРАЗУ
     // Пользователь не ждёт ответа сервера
@@ -93,7 +109,10 @@ export default function AuthPage() {
     if (e) e.preventDefault()
     setError('')
     setLoading(true)
-    setCountdown(60) // Запускаем таймер на 60 секунд сразу
+
+    // Запускаем таймер на 60 секунд (используем время окончания)
+    const endTime = Date.now() + 60000
+    setCountdownEndTime(endTime)
 
     // Оптимистично переходим на страницу ввода кода
     setStep('registerCode')
@@ -263,22 +282,14 @@ export default function AuthPage() {
                   )}
                 </div>
 
-                <div className="flex gap-2">
-                  <Button type="button" variant="ghost" onClick={() => {
-                    setStep('choose')
-                    setCodeRequested(false)
-                    setCountdown(0)
-                  }} className="flex-1">
-                    Назад
-                  </Button>
-                  <Button type="button" variant="outline" onClick={() => {
-                    setStep('register')
-                    if (authMethod === 'email') setEmail(contact)
-                    if (authMethod === 'phone') setPhone(contact)
-                  }} className="flex-1">
-                    Регистрация
-                  </Button>
-                </div>
+                <Button type="button" variant="ghost" onClick={() => {
+                  setStep('choose')
+                  setCodeRequested(false)
+                  setCountdown(0)
+                  setCountdownEndTime(null)
+                }} className="w-full">
+                  Назад
+                </Button>
               </form>
             </CardContent>
           </>
@@ -348,6 +359,7 @@ export default function AuthPage() {
                   setStep('choose')
                   setCodeRequested(false)
                   setCountdown(0)
+                  setCountdownEndTime(null)
                 }} className="w-full">
                   Назад
                 </Button>

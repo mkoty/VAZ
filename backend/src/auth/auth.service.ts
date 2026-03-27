@@ -52,10 +52,22 @@ export class AuthService {
   async verifyCode(contact: string, code: string, method: 'phone' | 'email') {
     const storedCode = this.otpStorage.get(contact);
 
-    if (!storedCode || storedCode !== code) {
+    console.log(`🔐 Проверка кода для ${contact}:`);
+    console.log(`   Введенный код: ${code}`);
+    console.log(`   Сохраненный код: ${storedCode || 'НЕ НАЙДЕН'}`);
+    console.log(`   Все коды в памяти:`, Array.from(this.otpStorage.entries()));
+
+    if (!storedCode) {
+      console.error(`❌ Код не найден в памяти для ${contact}`);
+      throw new BadRequestException('Код не найден. Возможно, он истек или не был запрошен.');
+    }
+
+    if (storedCode !== code) {
+      console.error(`❌ Неверный код для ${contact}. Ожидался: ${storedCode}, получен: ${code}`);
       throw new BadRequestException('Неверный код');
     }
 
+    console.log(`✅ Код верифицирован успешно для ${contact}`);
     this.otpStorage.delete(contact);
 
     const user = method === 'phone'
@@ -63,8 +75,11 @@ export class AuthService {
       : await this.usersService.findByEmail(contact);
 
     if (!user) {
+      console.error(`❌ Пользователь ${method}=${contact} не найден в БД`);
       throw new NotFoundException('Пользователь не найден');
     }
+
+    console.log(`✅ Пользователь найден: ID=${user.id}, Email=${user.email}`);
 
     return {
       success: true,
@@ -119,10 +134,22 @@ export class AuthService {
     const contact = userData.phone || userData.email;
     const storedCode = this.otpStorage.get(contact);
 
-    if (!storedCode || storedCode !== userData.code) {
+    console.log(`🔐 Подтверждение регистрации для ${contact}:`);
+    console.log(`   Введенный код: ${userData.code}`);
+    console.log(`   Сохраненный код: ${storedCode || 'НЕ НАЙДЕН'}`);
+    console.log(`   Все коды в памяти:`, Array.from(this.otpStorage.entries()));
+
+    if (!storedCode) {
+      console.error(`❌ Код не найден в памяти для ${contact}`);
+      throw new BadRequestException('Код не найден. Возможно, он истек или не был запрошен.');
+    }
+
+    if (storedCode !== userData.code) {
+      console.error(`❌ Неверный код для ${contact}. Ожидался: ${storedCode}, получен: ${userData.code}`);
       throw new BadRequestException('Неверный код');
     }
 
+    console.log(`✅ Код верифицирован успешно для ${contact}`);
     this.otpStorage.delete(contact);
 
     const user = await this.usersService.create({
