@@ -75,14 +75,21 @@ export class AuthService {
       : await this.usersService.findByEmail(contact);
 
     if (!user) {
-      console.error(`❌ Пользователь ${method}=${contact} не найден в БД`);
-      throw new NotFoundException('Пользователь не найден');
+      console.log(`⚠️  Пользователь ${method}=${contact} не найден в БД - требуется регистрация`);
+      return {
+        success: true,
+        userExists: false,
+        requiresRegistration: true,
+        message: 'Пользователь не найден. Необходима регистрация.',
+      };
     }
 
     console.log(`✅ Пользователь найден: ID=${user.id}, Email=${user.email}`);
 
     return {
       success: true,
+      userExists: true,
+      requiresRegistration: false,
       user: {
         id: user.id,
         name: `${user.firstName} ${user.lastName}`,

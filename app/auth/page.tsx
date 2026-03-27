@@ -81,25 +81,25 @@ export default function AuthPage() {
       const result = await api.verifyCode(contact, code, authMethod)
 
       if (result.success) {
-        localStorage.setItem('user', JSON.stringify(result.user))
-        localStorage.setItem('token', result.token)
-        router.push('/')
+        // Проверяем, требуется ли регистрация
+        if (result.requiresRegistration || !result.userExists) {
+          setError('Пользователь не найден. Перенаправление на регистрацию...')
+          // Переходим на регистрацию через 1.5 секунды
+          setTimeout(() => {
+            setStep('register')
+            if (authMethod === 'email') setEmail(contact)
+            if (authMethod === 'phone') setPhone(contact)
+          }, 1500)
+        } else {
+          // Успешный вход
+          localStorage.setItem('user', JSON.stringify(result.user))
+          localStorage.setItem('token', result.token)
+          router.push('/')
+        }
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Неверный код'
-
-      // Если пользователь не найден - предлагаем регистрацию
-      if (errorMessage.includes('не найден') || errorMessage.includes('Пользователь не найден')) {
-        setError('Пользователь не найден. Пожалуйста, зарегистрируйтесь.')
-        // Переходим на регистрацию через 2 секунды
-        setTimeout(() => {
-          setStep('register')
-          if (authMethod === 'email') setEmail(contact)
-          if (authMethod === 'phone') setPhone(contact)
-        }, 2000)
-      } else {
-        setError(errorMessage)
-      }
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
