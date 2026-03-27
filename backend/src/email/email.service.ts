@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import { Transporter } from 'nodemailer';
+import SMTPTransport from 'nodemailer/lib/smtp-transport';
+import * as dns from 'dns';
 
 @Injectable()
 export class EmailService {
@@ -17,7 +19,10 @@ export class EmailService {
       console.warn('⚠️ EMAIL_USER или EMAIL_PASSWORD не настроены. Email отправка отключена.');
     }
 
-    this.transporter = nodemailer.createTransport({
+    // Принудительно используем IPv4 для DNS резолвинга
+    dns.setDefaultResultOrder('ipv4first');
+
+    const transportOptions: SMTPTransport.Options = {
       host: isYandex ? 'smtp.yandex.ru' : 'smtp.gmail.com',
       port: 587, // Используем порт 587 для всех провайдеров (TLS/STARTTLS)
       secure: false, // false для порта 587 (будет использовать STARTTLS)
@@ -25,22 +30,20 @@ export class EmailService {
         user: emailUser,
         pass: emailPassword,
       },
-      // Принудительно используем IPv4 (Railway не поддерживает IPv6)
-      dnsOptions: {
-        family: 4, // 4 = IPv4 only, 6 = IPv6 only
-      },
       tls: {
         // Не проверяем сертификат для совместимости с Railway
         rejectUnauthorized: false,
         // Минимальная версия TLS
         minVersion: 'TLSv1.2',
-      },
+      } as any,
       connectionTimeout: 15000, // 15 секунд таймаут
       greetingTimeout: 15000,
       socketTimeout: 45000,
       debug: true, // Включаем debug режим
       logger: true, // Включаем логирование
-    });
+    };
+
+    this.transporter = nodemailer.createTransport(transportOptions);
 
     // Проверяем подключение при старте (не блокируем запуск приложения)
     if (emailUser && emailPassword) {
