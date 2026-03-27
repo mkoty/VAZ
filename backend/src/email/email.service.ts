@@ -25,13 +25,19 @@ export class EmailService {
         user: emailUser,
         pass: emailPassword,
       },
-      tls: {
-        // Не проверяем сертификат в development (для Railway)
-        rejectUnauthorized: process.env.NODE_ENV === 'production',
+      // Принудительно используем IPv4 (Railway не поддерживает IPv6)
+      dnsOptions: {
+        family: 4, // 4 = IPv4 only, 6 = IPv6 only
       },
-      connectionTimeout: 10000, // 10 секунд таймаут
-      greetingTimeout: 10000,
-      socketTimeout: 30000,
+      tls: {
+        // Не проверяем сертификат для совместимости с Railway
+        rejectUnauthorized: false,
+        // Минимальная версия TLS
+        minVersion: 'TLSv1.2',
+      },
+      connectionTimeout: 15000, // 15 секунд таймаут
+      greetingTimeout: 15000,
+      socketTimeout: 45000,
       debug: true, // Включаем debug режим
       logger: true, // Включаем логирование
     });
