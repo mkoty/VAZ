@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch: # Позволяет запускать вручную
 
 permissions:
   contents: read
@@ -21,19 +22,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: npm
+          node-version: '18'
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
       - name: Build with Next.js
-        run: npm run build:github
         env:
           DEPLOY_TARGET: github
+          NEXT_PUBLIC_API_URL: https://vaz-backend-production-8550.up.railway.app
+        run: npm run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
