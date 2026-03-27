@@ -147,8 +147,24 @@ export class AuthService {
     email?: string;
     code: string;
   }) {
-    const contact = userData.phone || userData.email;
-    const storedCode = this.otpStorage.get(contact);
+    // Пробуем найти код по email или phone (в зависимости от того, как регистрировались)
+    let contact: string;
+    let storedCode: string | undefined;
+
+    // Сначала пробуем email (приоритет), потом телефон
+    if (userData.email) {
+      storedCode = this.otpStorage.get(userData.email);
+      contact = userData.email;
+    }
+
+    if (!storedCode && userData.phone) {
+      storedCode = this.otpStorage.get(userData.phone);
+      contact = userData.phone;
+    }
+
+    if (!contact) {
+      contact = userData.email || userData.phone || 'unknown';
+    }
 
     console.log(`🔐 Подтверждение регистрации для ${contact}:`);
     console.log(`   Введенный код: ${userData.code}`);
