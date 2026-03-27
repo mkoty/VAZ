@@ -19,12 +19,19 @@ export class EmailService {
 
     this.transporter = nodemailer.createTransport({
       host: isYandex ? 'smtp.yandex.ru' : 'smtp.gmail.com',
-      port: isYandex ? 465 : 587,
-      secure: isYandex, // true для Yandex (465), false для Gmail (587)
+      port: 587, // Используем порт 587 для всех провайдеров (TLS/STARTTLS)
+      secure: false, // false для порта 587 (будет использовать STARTTLS)
       auth: {
         user: emailUser,
         pass: emailPassword,
       },
+      tls: {
+        // Не проверяем сертификат в development (для Railway)
+        rejectUnauthorized: process.env.NODE_ENV === 'production',
+      },
+      connectionTimeout: 10000, // 10 секунд таймаут
+      greetingTimeout: 10000,
+      socketTimeout: 30000,
       debug: true, // Включаем debug режим
       logger: true, // Включаем логирование
     });
