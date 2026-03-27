@@ -22,9 +22,16 @@ export class AuthService {
       console.log(`👤 Пользователь: ID=${user.id}, Email=${user.email}, Phone=${user.phone}`);
     }
 
-    // Генерируем код
-    const code = this.generateOTP();
-    this.otpStorage.set(contact, code);
+    // Проверяем, есть ли уже код для этого контакта
+    let code = this.otpStorage.get(contact);
+    if (code) {
+      console.log(`♻️  Повторная отправка существующего кода для ${contact}`);
+    } else {
+      // Генерируем новый код только если его нет
+      code = this.generateOTP();
+      this.otpStorage.set(contact, code);
+      console.log(`🆕 Сгенерирован новый код для ${contact}`);
+    }
 
     // Отправляем код на email (всегда используем email для верификации)
     const email = method === 'email' ? contact : user?.email;
