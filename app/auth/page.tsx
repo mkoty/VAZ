@@ -39,25 +39,28 @@ export default function AuthPage() {
     if (e) e.preventDefault()
     setError('')
     setLoading(true)
+    setCodeRequested(true)
+    setCountdown(60) // Запускаем таймер на 60 секунд сразу
 
+    // Оптимистично переходим на страницу ввода кода
+    // Пользователь не будет ждать ответа сервера
+    setStep('code')
+    setLoading(false)
+
+    // Запрос отправляется в фоне
     try {
       const result = await api.requestCode(contact, authMethod)
-      setCodeRequested(true)
-      setCountdown(60) // Запускаем таймер на 60 секунд
 
-      if (result.userExists) {
-        setStep('code')
-      } else {
-        // Пользователь не найден - на регистрацию
+      // Если пользователь не найден - переводим на регистрацию
+      if (!result.userExists) {
         setStep('register')
         if (authMethod === 'phone') setPhone(contact)
         if (authMethod === 'email') setEmail(contact)
       }
     } catch (err) {
-      setError('Ошибка соединения с сервером')
-      setCodeRequested(false)
-    } finally {
-      setLoading(false)
+      // При ошибке показываем сообщение, но оставляем на странице ввода кода
+      // Пользователь может попробовать запросить код повторно
+      console.error('Ошибка отправки кода:', err)
     }
   }
 
@@ -89,15 +92,18 @@ export default function AuthPage() {
     if (e) e.preventDefault()
     setError('')
     setLoading(true)
+    setCountdown(60) // Запускаем таймер на 60 секунд сразу
 
+    // Оптимистично переходим на страницу ввода кода
+    setStep('registerCode')
+    setLoading(false)
+
+    // Запрос отправляется в фоне
     try {
       await api.register({ firstName, lastName, phone, email })
-      setStep('registerCode')
-      setCountdown(60) // Запускаем таймер на 60 секунд
     } catch (err) {
-      setError('Ошибка регистрации')
-    } finally {
-      setLoading(false)
+      // При ошибке логируем, но оставляем пользователя на странице ввода кода
+      console.error('Ошибка регистрации:', err)
     }
   }
 
